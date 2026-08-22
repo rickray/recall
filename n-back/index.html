@@ -4,40 +4,156 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0d1117">
-  <meta name="description" content="N-back - Working memory training game on Recall.">
+  <meta name="description" content="N-back - Working memory training on Recall. Clean, fast, zero distractions.">
   <title>N-back | Recall</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
 </head>
 <body>
   <div class="container">
-    <div class="stub-container">
-      <div class="stub-icon-wrapper n-back" style="background: var(--accent-purple-dim); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.25);" aria-hidden="true">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-          <path d="M3 3v5h5"/>
-        </svg>
-      </div>
-      <h1 class="stub-title">N-back</h1>
-      <p class="stub-subtitle">Continuous working memory and fluid intelligence challenge.</p>
-      <div class="stub-badge">Coming Soon</div>
+    <header>
+      <nav class="game-nav">
+        <a href="../" class="nav-back-link" aria-label="Back to Recall Hub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <span>Hub</span>
+        </a>
 
-      <div class="stub-card">
-        <div class="stub-card-title">How it works</div>
-        <p class="stub-card-body">A continuous stream of stimuli appears. Indicate whether the current item matches the one shown exactly N trials earlier in the stream.</p>
+        <div class="nav-title-group">
+          <div class="nav-game-badge n-back" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+          </div>
+          <h1 class="nav-game-name">N-back</h1>
+        </div>
+
+        <button id="sound-toggle" class="icon-btn active" aria-label="Toggle Sound" title="Toggle Sound">
+          <svg id="sound-icon-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          <svg id="sound-icon-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <main class="nback-container">
+      <!-- Mode Selector -->
+      <div class="segmented-control" role="tablist" aria-label="N-back Level">
+        <button class="segmented-btn active" id="btn-n1" role="tab" aria-selected="true" data-n="1">
+          N = 1 (1-back)
+        </button>
+        <button class="segmented-btn" id="btn-n2" role="tab" aria-selected="false" data-n="2">
+          N = 2 (2-back)
+        </button>
       </div>
 
-      <a href="../" class="back-button">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-        <span>Back to Hub</span>
-      </a>
-    </div>
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-label">Trial</span>
+          <span class="stat-value" id="current-trial">0/21</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Hits</span>
+          <span class="stat-value" id="hits-count">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">False Alarms</span>
+          <span class="stat-value" id="fa-count">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Best Acc</span>
+          <span class="stat-value" id="best-accuracy">--</span>
+        </div>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+
+      <!-- Status Banner -->
+      <div class="status-banner" id="status-banner" aria-live="polite">
+        Select N level and press Start
+      </div>
+
+      <!-- 3x3 Grid Board -->
+      <div class="nback-board" id="board" role="region" aria-label="3 by 3 Grid">
+        <div class="nback-cell" data-index="0"></div>
+        <div class="nback-cell" data-index="1"></div>
+        <div class="nback-cell" data-index="2"></div>
+        <div class="nback-cell" data-index="3"></div>
+        <div class="nback-cell" data-index="4"></div>
+        <div class="nback-cell" data-index="5"></div>
+        <div class="nback-cell" data-index="6"></div>
+        <div class="nback-cell" data-index="7"></div>
+        <div class="nback-cell" data-index="8"></div>
+      </div>
+
+      <!-- Response Controls (Match / No Match) -->
+      <div class="nback-controls" id="decision-controls">
+        <button id="btn-match" class="nback-btn-match" disabled>
+          <span>Match</span>
+          <span class="btn-subtext" id="match-hint">Same as 1 step back</span>
+        </button>
+        <button id="btn-nomatch" class="nback-btn-nomatch" disabled>
+          <span>No Match</span>
+          <span class="btn-subtext">Different position</span>
+        </button>
+      </div>
+
+      <!-- Start Button Area -->
+      <div id="action-area">
+        <button id="start-btn" class="btn btn-purple">Start Round (21 Trials)</button>
+      </div>
+
+      <!-- Round Summary Card -->
+      <div id="summary-card" class="summary-card" style="display: none;">
+        <h2 class="summary-title" id="summary-title">Round Complete</h2>
+        <p class="summary-subtitle" id="summary-subtitle">Here is your working memory performance breakdown:</p>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-item-label">Overall Accuracy</div>
+            <div class="summary-item-val" id="summary-accuracy">0%</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">Hits (Correct Matches)</div>
+            <div class="summary-item-val" id="summary-hits">0/0</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">False Alarms</div>
+            <div class="summary-item-val" id="summary-fa">0</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">Correct Rejections</div>
+            <div class="summary-item-val" id="summary-cr">0/0</div>
+          </div>
+        </div>
+        <button id="restart-btn" class="btn btn-purple">Play Again</button>
+      </div>
+
+      <!-- Rules Explanation -->
+      <div class="rules-card">
+        <div class="rules-title">How It Works</div>
+        <p class="rules-body" id="rules-explanation">
+          A cell lights up each trial. Tap <strong>Match</strong> if the lit cell is in the exact same location as <strong>1 step earlier</strong>. Tap <strong>No Match</strong> if it is different. A standard round consists of 20 test trials.
+        </p>
+      </div>
+    </main>
 
     <footer>
       <p>&copy; Recall &bull; <a href="../">Home</a></p>
     </footer>
   </div>
+
+  <script src="game.js"></script>
 </body>
 </html>

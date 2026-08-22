@@ -4,42 +4,105 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0d1117">
-  <meta name="description" content="Sequence - Simon-style memory training game on Recall.">
+  <meta name="description" content="Sequence - Simon-style sequential memory training on Recall. Clean, fast, zero distractions.">
   <title>Sequence | Recall</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
 </head>
 <body>
   <div class="container">
-    <div class="stub-container">
-      <div class="stub-icon-wrapper sequence" style="background: var(--accent-cyan-dim); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.25);" aria-hidden="true">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="6" cy="12" r="3"/>
-          <circle cx="12" cy="12" r="3"/>
-          <circle cx="18" cy="12" r="3"/>
-          <path d="M6 12h12"/>
-        </svg>
-      </div>
-      <h1 class="stub-title">Sequence</h1>
-      <p class="stub-subtitle">Simon-style auditory and visual sequential recall exercise.</p>
-      <div class="stub-badge">Coming Soon</div>
+    <header>
+      <nav class="game-nav">
+        <a href="../" class="nav-back-link" aria-label="Back to Recall Hub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <span>Hub</span>
+        </a>
 
-      <div class="stub-card">
-        <div class="stub-card-title">How it works</div>
-        <p class="stub-card-body">A sequence of signals lights up in increasing lengths. Test your short-term sequential recall under progressive time pressure.</p>
+        <div class="nav-title-group">
+          <div class="nav-game-badge sequence" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="12" cy="12" r="3"/>
+              <circle cx="18" cy="12" r="3"/>
+              <path d="M6 12h12"/>
+            </svg>
+          </div>
+          <h1 class="nav-game-name">Sequence</h1>
+        </div>
+
+        <button id="sound-toggle" class="icon-btn active" aria-label="Toggle Sound" title="Toggle Sound">
+          <svg id="sound-icon-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          <svg id="sound-icon-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <main class="sequence-container">
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-label">Length</span>
+          <span class="stat-value" id="current-length">1</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Best</span>
+          <span class="stat-value" id="best-length">0</span>
+        </div>
       </div>
 
-      <a href="../" class="back-button">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-        <span>Back to Hub</span>
-      </a>
-    </div>
+      <div class="status-banner" id="status-banner" aria-live="polite">
+        Press Start to begin
+      </div>
+
+      <div class="sequence-board" id="board" role="region" aria-label="Sequence Board">
+        <button class="pad pad-0 disabled" data-pad="0" aria-label="Cyan Pad (Top-Left)"></button>
+        <button class="pad pad-1 disabled" data-pad="1" aria-label="Purple Pad (Top-Right)"></button>
+        <button class="pad pad-2 disabled" data-pad="2" aria-label="Amber Pad (Bottom-Left)"></button>
+        <button class="pad pad-3 disabled" data-pad="3" aria-label="Emerald Pad (Bottom-Right)"></button>
+      </div>
+
+      <div id="action-area">
+        <button id="start-btn" class="btn btn-cyan">Start Exercise</button>
+      </div>
+
+      <div id="summary-card" class="summary-card" style="display: none;">
+        <h2 class="summary-title" id="summary-title">Round Ended</h2>
+        <p class="summary-subtitle" id="summary-subtitle">Here is your performance summary:</p>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-item-label">Length Reached</div>
+            <div class="summary-item-val" id="summary-score">0</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">Personal Best</div>
+            <div class="summary-item-val" id="summary-best">0</div>
+          </div>
+        </div>
+        <button id="restart-btn" class="btn btn-cyan">Play Again</button>
+      </div>
+
+      <div class="rules-card">
+        <div class="rules-title">How It Works</div>
+        <p class="rules-body">
+          Watch the sequence of illuminated pads, then tap them back in the exact order. Each successful round extends the pattern by one step. A single misstep ends the exercise.
+        </p>
+      </div>
+    </main>
 
     <footer>
       <p>&copy; Recall &bull; <a href="../">Home</a></p>
     </footer>
   </div>
+
+  <script src="game.js"></script>
 </body>
 </html>
