@@ -11,6 +11,7 @@ Focused adult cognitive training and memory games in a fast, minimal, mobile-fir
 - **Sequence**: Simon-style progressive auditory and visual sequential recall.
 - **N-back**: Working memory training matching stimuli against items presented *N* steps back.
 - **Spatial Grid**: Visuospatial pattern recall across coordinate matrix boards.
+- **Even Factors**: Calm multiplication drill where both factors end in an even digit (0, 2, 4, 6, 8).
 
 ---
 
