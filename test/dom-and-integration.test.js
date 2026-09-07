@@ -24,6 +24,9 @@ test('HTML integrity: even-factors/index.html structure', () => {
   assert.match(gameHtml, /id="btn-skip"/, 'Must have skip button');
   assert.match(gameHtml, /id="status-banner"/, 'Must have status banner');
   assert.match(gameHtml, /src="game\.js"/, 'Must load game.js');
+  // Must NOT have 2-digit x 2-digit mode button
+  assert.doesNotMatch(gameHtml, /2-Digit &times; 2-Digit/, 'Must not have 2-Digit x 2-Digit mode');
+  assert.doesNotMatch(gameHtml, /data-mode="2-digit"/, 'Must not have data-mode="2-digit"');
 });
 
 test('CSS integrity: style.css classes exist and have ≥48px touch targets', () => {
@@ -48,6 +51,7 @@ test('JavaScript execution & logic completeness: game.js file analysis', () => {
   assert.match(js, /handleCheck/, 'Must handle answer checking');
   assert.match(js, /handleSkip/, 'Must handle skipping problems gently');
   assert.match(js, /keydown/, 'Must listen to keyboard input');
+  assert.doesNotMatch(js, /btnMode2digit/, 'Must not reference removed 2-digit mode button');
 });
 
 test('Exhaustive Even-Ending Rules Verification', () => {

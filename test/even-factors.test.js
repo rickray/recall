@@ -30,7 +30,12 @@ export function isValidEvenFactor(n) {
 
 /**
  * Generates a random problem { a, b, product }
- * Supports optional difficulty modes if desired (e.g. 'all', '1-digit', '2-digit')
+ * Rule constraint: EVERY problem must have at least one factor that is a single digit (2, 4, 6, 8).
+ * The other factor is 1 or 2 digits ending in an even digit (0, 2, 4, 6, 8).
+ * Modes:
+ * - 'mixed': random mix where at least one factor is single digit, and the other can be 1-digit or 2-digit.
+ * - '1x1': single digit x single digit (2, 4, 6, 8)
+ * - '1x2': single digit x 2-digit (10, 12, ... 98)
  */
 export function generateProblem(mode = 'mixed') {
   const allCandidates = getValidEvenFactors();
@@ -38,12 +43,9 @@ export function generateProblem(mode = 'mixed') {
   const doubleDigit = allCandidates.filter(n => n >= 10); // [10, 12, ... 98]
 
   let a, b;
-  if (mode === '1-digit') {
+  if (mode === '1x1') {
     a = singleDigit[Math.floor(Math.random() * singleDigit.length)];
     b = singleDigit[Math.floor(Math.random() * singleDigit.length)];
-  } else if (mode === '2-digit') {
-    a = doubleDigit[Math.floor(Math.random() * doubleDigit.length)];
-    b = doubleDigit[Math.floor(Math.random() * doubleDigit.length)];
   } else if (mode === '1x2') {
     const pickFirstSingle = Math.random() < 0.5;
     if (pickFirstSingle) {
@@ -54,15 +56,17 @@ export function generateProblem(mode = 'mixed') {
       b = singleDigit[Math.floor(Math.random() * singleDigit.length)];
     }
   } else {
-    // Mixed: balanced sampling so single digits aren't drowned out by 45 two-digit numbers
-    const pickSingleA = Math.random() < 0.35;
-    const pickSingleB = Math.random() < 0.35;
-    a = pickSingleA
-      ? singleDigit[Math.floor(Math.random() * singleDigit.length)]
-      : doubleDigit[Math.floor(Math.random() * doubleDigit.length)];
-    b = pickSingleB
-      ? singleDigit[Math.floor(Math.random() * singleDigit.length)]
-      : doubleDigit[Math.floor(Math.random() * doubleDigit.length)];
+    // Mixed: At least one factor is guaranteed single-digit (2, 4, 6, 8)
+    // The other factor is sampled from allCandidates (1- or 2-digit)
+    const single = singleDigit[Math.floor(Math.random() * singleDigit.length)];
+    const other = allCandidates[Math.floor(Math.random() * allCandidates.length)];
+    if (Math.random() < 0.5) {
+      a = single;
+      b = other;
+    } else {
+      a = other;
+      b = single;
+    }
   }
 
   return {
@@ -117,10 +121,10 @@ test('Factor Validation: isValidEvenFactor', () => {
   assert.equal(isValidEvenFactor('24'), false);
 });
 
-test('Problem Generation: Generate 1000 problems and verify all factor constraints', () => {
-  const modes = ['mixed', '1-digit', '2-digit', '1x2'];
+test('Problem Generation: At least one factor is ALWAYS < 10 across all modes and never two 2-digit factors', () => {
+  const modes = ['mixed', '1x1', '1x2', undefined];
   for (const mode of modes) {
-    for (let i = 0; i < 250; i++) {
+    for (let i = 0; i < 500; i++) {
       const problem = generateProblem(mode);
       assert.ok(problem.a, 'Problem must have factor a');
       assert.ok(problem.b, 'Problem must have factor b');
@@ -133,6 +137,14 @@ test('Problem Generation: Generate 1000 problems and verify all factor constrain
       const bLast = problem.b % 10;
       assert.equal([0, 2, 4, 6, 8].includes(aLast), true, `Factor a last digit ${aLast} must be even`);
       assert.equal([0, 2, 4, 6, 8].includes(bLast), true, `Factor b last digit ${bLast} must be even`);
+
+      // CRITICAL REQUIREMENT: At least one factor MUST be a single digit (< 10), from {2, 4, 6, 8}
+      const hasSingleDigit = (problem.a < 10) || (problem.b < 10);
+      assert.equal(hasSingleDigit, true, `At least one factor must be < 10, got ${problem.a} × ${problem.b}`);
+
+      // Cannot have two 2-digit factors
+      const bothTwoDigits = (problem.a >= 10) && (problem.b >= 10);
+      assert.equal(bothTwoDigits, false, `Never show two 2-digit factors: ${problem.a} × ${problem.b}`);
     }
   }
 });
@@ -141,7 +153,7 @@ test('Keypad Input Logic: digits, backspace, clear', () => {
   let input = '';
   
   function appendDigit(val) {
-    if (input.length >= 6) return input; // max product length limit (e.g. 98*98 = 9604, 4 digits)
+    if (input.length >= 6) return input;
     if (input === '0' && val === '0') return input;
     if (input === '0' && val !== '0') {
       input = val;

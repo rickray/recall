@@ -122,7 +122,10 @@
 
   function generateProblem(mode = 'mixed') {
     let a, b;
-    if (mode === '1x2') {
+    if (mode === '1x1') {
+      a = singleDigitFactors[Math.floor(Math.random() * singleDigitFactors.length)];
+      b = singleDigitFactors[Math.floor(Math.random() * singleDigitFactors.length)];
+    } else if (mode === '1x2') {
       const pickFirstSingle = Math.random() < 0.5;
       if (pickFirstSingle) {
         a = singleDigitFactors[Math.floor(Math.random() * singleDigitFactors.length)];
@@ -131,19 +134,18 @@
         a = doubleDigitFactors[Math.floor(Math.random() * doubleDigitFactors.length)];
         b = singleDigitFactors[Math.floor(Math.random() * singleDigitFactors.length)];
       }
-    } else if (mode === '2-digit') {
-      a = doubleDigitFactors[Math.floor(Math.random() * doubleDigitFactors.length)];
-      b = doubleDigitFactors[Math.floor(Math.random() * doubleDigitFactors.length)];
     } else {
-      // Mixed: balanced sampling so single digits are reasonably common
-      const pickSingleA = Math.random() < 0.35;
-      const pickSingleB = Math.random() < 0.35;
-      a = pickSingleA
-        ? singleDigitFactors[Math.floor(Math.random() * singleDigitFactors.length)]
-        : doubleDigitFactors[Math.floor(Math.random() * doubleDigitFactors.length)];
-      b = pickSingleB
-        ? singleDigitFactors[Math.floor(Math.random() * singleDigitFactors.length)]
-        : doubleDigitFactors[Math.floor(Math.random() * doubleDigitFactors.length)];
+      // Mixed: At least one factor is guaranteed single-digit (2, 4, 6, 8)
+      // The other factor is sampled from allFactors (1- or 2-digit)
+      const single = singleDigitFactors[Math.floor(Math.random() * singleDigitFactors.length)];
+      const other = allFactors[Math.floor(Math.random() * allFactors.length)];
+      if (Math.random() < 0.5) {
+        a = single;
+        b = other;
+      } else {
+        a = other;
+        b = single;
+      }
     }
 
     return {
@@ -162,7 +164,7 @@
   const soundIconOff = document.getElementById('sound-icon-off');
   const btnModeMixed = document.getElementById('btn-mode-mixed');
   const btnMode1x2 = document.getElementById('btn-mode-1x2');
-  const btnMode2digit = document.getElementById('btn-mode-2digit');
+  const btnMode1x1 = document.getElementById('btn-mode-1x1');
   const solvedCountEl = document.getElementById('solved-count');
   const currentStreakEl = document.getElementById('current-streak');
   const bestStreakEl = document.getElementById('best-streak');
@@ -227,7 +229,7 @@
   }
 
   function updateModeButtons() {
-    const buttons = [btnModeMixed, btnMode1x2, btnMode2digit];
+    const buttons = [btnModeMixed, btnMode1x2, btnMode1x1].filter(Boolean);
     buttons.forEach(btn => {
       const mode = btn.dataset.mode;
       const isActive = mode === currentMode;
@@ -243,9 +245,9 @@
     nextProblem();
   }
 
-  btnModeMixed.addEventListener('click', () => setMode('mixed'));
-  btnMode1x2.addEventListener('click', () => setMode('1x2'));
-  btnMode2digit.addEventListener('click', () => setMode('2-digit'));
+  if (btnModeMixed) btnModeMixed.addEventListener('click', () => setMode('mixed'));
+  if (btnMode1x2) btnMode1x2.addEventListener('click', () => setMode('1x2'));
+  if (btnMode1x1) btnMode1x1.addEventListener('click', () => setMode('1x1'));
 
   function nextProblem() {
     if (transitionTimeout) {
