@@ -20,7 +20,11 @@ Even Factors is a calm, focused arithmetic drill for adults on Recall (https://r
    - 1-digit candidates: $\{2, 4, 6, 8\}$ (note: 0 is excluded since factors are non-zero positive multipliers in natural multiplication drill, 1-99 range).
    - 2-digit candidates: tens digit $\in \{1, \ldots, 9\}$, units digit $\in \{0, 2, 4, 6, 8\}$, i.e., $10, 12, 14, 16, 18, 20, \ldots, 98$. (Total 45 two-digit candidates).
    - Total valid candidates = 4 + 45 = 49 numbers.
-   - For varied drill difficulty, we sample factors $a$ and $b$ independently from the set of valid numbers. We can support difficulty modes (e.g., Mixed, 1-Digit x 2-Digit, 2-Digit x 2-Digit, or simple balanced weighted generation) or standard calm progression.
+   - **Single-Digit Constraint (Required)**: EVERY problem has at least one factor that is a single digit $\in \{2, 4, 6, 8\}$. The other factor is 1 or 2 digits ending in an even digit (0, 2, 4, 6, 8). Both factors are never simultaneously two-digit.
+   - Modes:
+     - **Mixed**: At least one factor is single-digit (2, 4, 6, 8), other factor sampled from all valid even-ending numbers (1- or 2-digit).
+     - **1-Digit × 1-Digit**: Both factors from $\{2, 4, 6, 8\}$.
+     - **1-Digit × 2-Digit**: One factor from $\{2, 4, 6, 8\}$, other from $\{10, 12, \ldots, 98\}$.
 2. **Product**:
    - $P = a \times b$.
 3. **Calm Drill Flow**:
