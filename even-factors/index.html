@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="description" content="Even Factors - Calm arithmetic multiplication practice on Recall. Clean, fast, zero distractions.">
+  <title>Even Factors | Recall</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <nav class="game-nav">
+        <a href="../" class="nav-back-link" aria-label="Back to Recall Hub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <span>Hub</span>
+        </a>
+
+        <div class="nav-title-group">
+          <div class="nav-game-badge even-factors" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </div>
+          <h1 class="nav-game-name">Even Factors</h1>
+        </div>
+
+        <button id="sound-toggle" class="icon-btn active" aria-label="Toggle Sound" title="Toggle Sound">
+          <svg id="sound-icon-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          <svg id="sound-icon-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <main class="even-factors-container">
+      <!-- Mode Selector -->
+      <div class="segmented-control" role="tablist" aria-label="Difficulty Mode">
+        <button class="segmented-btn active" id="btn-mode-mixed" role="tab" aria-selected="true" data-mode="mixed">
+          Mixed
+        </button>
+        <button class="segmented-btn" id="btn-mode-1x2" role="tab" aria-selected="false" data-mode="1x2">
+          1-Digit &times; 2-Digit
+        </button>
+        <button class="segmented-btn" id="btn-mode-2digit" role="tab" aria-selected="false" data-mode="2-digit">
+          2-Digit &times; 2-Digit
+        </button>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <span class="stat-label">Solved</span>
+          <span class="stat-value" id="solved-count">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Streak</span>
+          <span class="stat-value" id="current-streak">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Best Streak</span>
+          <span class="stat-value" id="best-streak">0</span>
+        </div>
+      </div>
+
+      <!-- Status Banner -->
+      <div class="status-banner" id="status-banner" aria-live="polite">
+        Enter the product and tap Check
+      </div>
+
+      <!-- Problem Card -->
+      <div class="problem-card" id="problem-card">
+        <div class="problem-equation">
+          <span class="problem-factor" id="factor-a">--</span>
+          <span class="problem-op">&times;</span>
+          <span class="problem-factor" id="factor-b">--</span>
+          <span class="problem-equals">=</span>
+        </div>
+        <div class="answer-display-wrapper">
+          <div class="answer-display focused" id="answer-display" role="textbox" aria-label="Current Answer Input" tabindex="0">
+            <span class="answer-placeholder">?</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone-first Number Pad -->
+      <div class="numpad-grid" role="group" aria-label="Numeric Keypad">
+        <button class="numpad-key" data-key="1" aria-label="1">1</button>
+        <button class="numpad-key" data-key="2" aria-label="2">2</button>
+        <button class="numpad-key" data-key="3" aria-label="3">3</button>
+
+        <button class="numpad-key" data-key="4" aria-label="4">4</button>
+        <button class="numpad-key" data-key="5" aria-label="5">5</button>
+        <button class="numpad-key" data-key="6" aria-label="6">6</button>
+
+        <button class="numpad-key" data-key="7" aria-label="7">7</button>
+        <button class="numpad-key" data-key="8" aria-label="8">8</button>
+        <button class="numpad-key" data-key="9" aria-label="9">9</button>
+
+        <button class="numpad-key key-action" id="key-clear" data-action="clear" aria-label="Clear input">C</button>
+        <button class="numpad-key" data-key="0" aria-label="0">0</button>
+        <button class="numpad-key key-action" id="key-backspace" data-action="backspace" aria-label="Backspace">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+            <line x1="18" y1="9" x2="12" y2="15"/>
+            <line x1="12" y1="9" x2="18" y2="15"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Action Row -->
+      <div class="even-factors-actions">
+        <button id="btn-skip" class="btn btn-secondary">Skip</button>
+        <button id="btn-check" class="btn btn-emerald">Check Answer</button>
+      </div>
+
+      <!-- Rules Explanation -->
+      <div class="rules-card">
+        <div class="rules-title">How It Works</div>
+        <p class="rules-body">
+          Calculate the product of two numbers. Every factor is a 1- or 2-digit integer ending in an even digit (<strong>0, 2, 4, 6, or 8</strong>). There are no timers—practice calmly at your own pace.
+        </p>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; Recall &bull; <a href="../">Home</a></p>
+    </footer>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
